@@ -14,6 +14,10 @@ where i.idUsuario not in
 	from inscripciones as i inner join
 	Pagos as p on p.idinscripcion=i.id)
 
+
+Select distinct dat.Apellidos, dat.Nombres From Datos_Personales as DAT, Inscripciones as iWhere i.IDUsuario = dat.ID  and i.ID  not in (Select distinct p.IDInscripcion From Pagos p)
+
+
 -- 3  Listado de países que no tengan usuarios relacionados.
 
 select p.Nombre from Paises as p
@@ -127,7 +131,24 @@ from Cursos c
 
 -- 12  Listado con nombre de país de aquellos que hayan registrado más usuarios de género masculino que de género femenino.
 
+select aux.Pais
+from
+	(
+		select p.nombre as Pais,
+			(select count(*) from Datos_Personales dat where p.ID=dat.IDPais and dat.Genero like '%m%') as UsuariosMasculinos,
+			(select count (*) from Datos_Personales dat where p.ID=dat.IDPais and dat.Genero like '%f%') as UsuariosFemeninos
+		from Paises p
+	) as aux
+where aux.UsuariosMasculinos > aux.UsuariosFemeninos
+
 -- 13  Listado con nombre de país de aquellos que hayan registrado más usuarios de género masculino que de género femenino pero que haya registrado al menos un usuario de género femenino.
+
+select aux.Nombre
+from (select p.nombre,
+		(select COUNT(*) from Datos_Personales dat where dat.IDPais = p.ID and dat.Genero like 'F') as cantMujeres, 
+		(select count(*) from Datos_Personales dat where dat.IDPais = p.ID and dat.Genero like 'M') as cantVarones
+	from paises p) as aux
+where aux.cantMujeres < aux.cantVarones and aux.cantMujeres>0
 
 -- 14  Listado de cursos que hayan registrado la misma cantidad de idiomas de audio que de subtítulos.
 
