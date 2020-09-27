@@ -66,7 +66,22 @@ select dat.apellidos, dat.nombres,
 from Datos_Personales dat
 
 -- 9  Listado con nombres de los cursos y la cantidad de idiomas de cada tipo. Es decir, la cantidad de idiomas de audio, la cantidad de subtítulos y la cantidad de texto de video.
+	select c.nombre,
+					(select count(*) from Idiomas_x_Curso IxC, TiposIdioma ti 
+					where IxC.IDCurso=c.ID and IxC.IDTipo = ti.ID 
+					and ti.Nombre like '%Audio%') 
+					as 'Cantidad Audios',
 
+					(select count(*) from Idiomas_x_Curso IxC, TiposIdioma ti
+					where IxC.IDCurso=c.ID and IxC.IDTipo=ti.ID 
+					and ti.Nombre like '%Subtítulo%') 
+					as 'Cantidad Subtítulo',
+					
+					(select count(*) from Idiomas_x_Curso IxC, TiposIdioma ti
+					where IxC.IDCurso=c.ID and IxC.IDTipo=ti.ID 
+					and ti.Nombre like '%Texto del video%') 
+					as 'Cantidad Texto del Video'
+	from Cursos as c
 
 
 -- 10  Listado con apellidos y nombres de los usuarios, nombre de usuario y cantidad de cursos de nivel 'Principiante' que realizó y cantidad de cursos de nivel 'Avanzado' que realizó.
