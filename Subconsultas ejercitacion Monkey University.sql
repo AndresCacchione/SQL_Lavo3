@@ -66,6 +66,7 @@ select dat.apellidos, dat.nombres,
 from Datos_Personales dat
 
 -- 9  Listado con nombres de los cursos y la cantidad de idiomas de cada tipo. Es decir, la cantidad de idiomas de audio, la cantidad de subtítulos y la cantidad de texto de video.
+	
 	select c.nombre,
 					(select count(*) from Idiomas_x_Curso IxC, TiposIdioma ti 
 					where IxC.IDCurso=c.ID and IxC.IDTipo = ti.ID 
@@ -85,8 +86,44 @@ from Datos_Personales dat
 
 
 -- 10  Listado con apellidos y nombres de los usuarios, nombre de usuario y cantidad de cursos de nivel 'Principiante' que realizó y cantidad de cursos de nivel 'Avanzado' que realizó.
+	
+	select dat.apellidos, dat.nombres, u.nombreUsuario,
+					(select count(*)
+					from (select distinct c.ID, c.IDNivel, i.IDUsuario
+								from Cursos c, Inscripciones i, Niveles n
+								where c.ID=i.IDCurso and n.ID=c.IDNivel 
+								and i.IDUsuario=dat.ID) as Cursos_dist, 
+					Niveles n
+					where n.ID=Cursos_dist.IDNivel and n.Nombre like '%Principiante%'
+					)as 'Cantidad Principiante',
+													
+					(select count(*)
+					from (select distinct c.ID, c.IDNivel, i.IDUsuario
+								from Cursos c, Inscripciones i, Niveles n
+								where c.ID=i.IDCurso and n.ID=c.IDNivel
+								and i.IDUsuario=dat.ID) as Cursos_dist_avanzados,
+					Niveles n
+					where n.ID=Cursos_dist_avanzados.IDNivel and n.Nombre like '%Avanzado%'
+					)as 'Cantidad Avanzado'
+	from Datos_Personales dat, Usuarios u
+	where dat.ID=u.ID
 
 -- 11  Listado con nombre de los cursos y la recaudación de inscripciones de usuarios de género femenino que se inscribieron y la recaudación de inscripciones de usuarios de género masculino.
+
+select c.nombre as NombreCurso, 
+								(select isnull(sum(i.costo),0) 
+								from Inscripciones i, Datos_Personales dat
+								where dat.ID=i.IDUsuario and dat.Genero like 'F' 
+								and I.IDUsuario=c.ID
+								) as 'Recaudación Mujeres', 
+								
+								(select isnull(sum(i.costo),0)
+								from Inscripciones i, Datos_Personales dat
+								where i.IDUsuario=dat.ID and dat.Genero like 'M' 
+								and I.IDUsuario=c.ID
+								) as 'Recaudación Varones'
+from Cursos c
+
 
 -- 12  Listado con nombre de país de aquellos que hayan registrado más usuarios de género masculino que de género femenino.
 
