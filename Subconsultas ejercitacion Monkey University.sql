@@ -150,8 +150,57 @@ from (select p.nombre,
 	from paises p) as aux
 where aux.cantMujeres < aux.cantVarones and aux.cantMujeres>0
 
--- 14  Listado de cursos que hayan registrado la misma cantidad de idiomas de audio que de subtítulos.
+-- 14  Listado de cursos que hayan registrado la misma 
+-- cantidad de idiomas de audio que de subtítulos.
+
+select tablaAux.Nombre
+from (
+		select c.nombre,
+			(select count(*) 
+			from Idiomas_x_Curso ixc, TiposIdioma ti 
+			where ixc.IDTipo = ti.ID and c.ID = ixc.IDCurso 
+			and ti.Nombre like '%audio%'
+			) as CantAudio,
+		
+			(select count(*) 
+			from Idiomas_x_Curso ixc, TiposIdioma ti
+			where ixc.IDTipo=ti.ID and c.ID=ixc.IDCurso
+			and ti.Nombre like '%subtítulo%') as CantSubtitulo
+		from Cursos as c
+	) as tablaAux
+where tablaAux.CantAudio=tablaAux.CantSubtitulo
 
 -- 15  Listado de usuarios que hayan realizado más cursos en el año 2018 que en el 2019 y a su vez más cursos en el año 2019 que en el 2020.
+select tablaAuxiliar.NomApe
+from (
+	select dat.nombres + ',' + dat.apellidos as NomApe,
+	
+		(select distinct count(i.IDCurso)
+		from Inscripciones i
+		where i.IDUsuario=dat.ID and year(i.Fecha) = 2018
+		) as cursos2018,
+
+		(select distinct count(i.IDCurso)
+		from Inscripciones i
+		where i.IDUsuario=dat.ID and year(i.fecha) = 2019
+		) as cursos2019,
+	
+		(select distinct count(i.IDCurso)
+		from Inscripciones i
+		where i.IDUsuario=dat.ID and year(i.Fecha) = 2020
+		) as cursos2020
+
+	from Datos_Personales dat
+	) as tablaAuxiliar
+where tablaAuxiliar.cursos2018 > tablaAuxiliar.cursos2019
+and tablaAuxiliar.cursos2019 > tablaAuxiliar.cursos2020
 
 -- 16 Listado de apellido y nombres de usuarios que hayan realizado cursos pero nunca se hayan certificado.
+
+select distinct aux.apeNom
+from(
+		select i.ID idi, dat.ID, dat.apellidos + ' , ' + dat.nombres as apeNom
+		from Datos_Personales dat, Inscripciones i
+		where i.IDUsuario=dat.ID and i.ID not in
+				(select IDInscripcion from Certificaciones)
+	) as aux
