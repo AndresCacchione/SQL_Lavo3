@@ -15,7 +15,10 @@ where i.idUsuario not in
 	Pagos as p on p.idinscripcion=i.id)
 
 
-Select distinct dat.Apellidos, dat.Nombres From Datos_Personales as DAT, Inscripciones as iWhere i.IDUsuario = dat.ID  and i.ID  not in (Select distinct p.IDInscripcion From Pagos p)
+Select distinct dat.Apellidos, dat.Nombres 
+From Datos_Personales as DAT, Inscripciones as i
+Where i.IDUsuario = dat.ID  
+and i.ID  not in (Select distinct p.IDInscripcion From Pagos p)
 
 
 -- 3  Listado de países que no tengan usuarios relacionados.
