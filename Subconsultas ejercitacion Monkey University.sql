@@ -200,6 +200,25 @@ and tablaAuxiliar.cursos2019 > tablaAuxiliar.cursos2020
 
 -- 16 Listado de apellido y nombres de usuarios que hayan realizado cursos pero nunca se hayan certificado.
 
+--- Resolución luego de entender bien el enunciado: ---
+select tablaAux.Apenom
+from
+	(select dat.apellidos + ' , ' + dat.nombres as Apenom,
+			(select count(*) 
+			from Inscripciones i
+			where i.IDUsuario=dat.ID
+			) as cantidadCursos,
+
+			(select count(*)
+			from Inscripciones i, Certificaciones cer
+			where cer.IDInscripcion=i.ID and i.IDUsuario=dat.ID
+			) as Certificaciones
+	from Datos_Personales dat
+	) as tablaAux
+where tablaAux.cantidadCursos>0 and tablaAux.Certificaciones=0
+
+
+--- Mal resuleto por mi ---
 select distinct aux.apeNom
 from(
 		select i.ID idi, dat.ID, dat.apellidos + ' , ' + dat.nombres as apeNom
