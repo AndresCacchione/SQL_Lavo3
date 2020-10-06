@@ -2,6 +2,12 @@
 
 --Rehacer usando group by
 
+select ve.nombre, ve.apelldio, count(*)
+from vecinos ve inner join propiedades prop 
+on ve.dni=prop.dni
+group by ve.nombre, ve.apellido
+
+
 select ve.apellido, ve.nombre,
 		(select count (*)
 		from propiedades prop, tipos_propiedades tp
@@ -9,6 +15,13 @@ select ve.apellido, ve.nombre,
 		and ve.dni = prop.dni
 		) as CantProp
 from vecinos ve
+
+
+select ve.apellido, ve.nombre, tp.nombre, count(*)
+from vecinos ve inner join propiedades prop on ve.dni=prop.dni
+inner join tipos_propiedades tp on tp.id=prop.IDtipo
+group by ve.apellido, ve.nombre, tp.nombre
+
 
 --Ejercicio 2:
 

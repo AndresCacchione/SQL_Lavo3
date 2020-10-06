@@ -12,10 +12,9 @@ order by pe.PESO desc
 select pa.apellido, pa.NOMBRE
 from PARTICIPANTES pa
 where pa.IDPARTICIPANTE not in 
-(select part.IDPARTICIPANTE
-from PARTICIPANTES part, PESCA pe, ESPECIES e
-where part.IDPARTICIPANTE=pe.IDPARTICIPANTE
-and e.IDESPECIE=pe.IDESPECIE
+(select pe.IDPARTICIPANTE
+from PESCA pe, ESPECIES e
+where e.IDESPECIE=pe.IDESPECIE
 and e.ESPECIE like '%bagre%')
 
 -- Ejercicio 3
@@ -50,10 +49,11 @@ Order by 1
 select es.especie,
 	(select count(*)
 	from PESCA pe
-	where datepart(hour, pe.FECHA_HORA) >= 21 or datepart(hour, pe.FECHA_HORA) <=5
+	where (datepart(hour, pe.FECHA_HORA) >= 21 or datepart(hour, pe.FECHA_HORA) <=5)
 	and pe.IDESPECIE=es.IDESPECIE
 	) as cantPescada
 from ESPECIES es
+
 
 -- Ejercicio 5
 
@@ -101,3 +101,27 @@ From PARTICIPANTES PAR
 Right Join PESCA P on PAR.IDPARTICIPANTE = P.IDPARTICIPANTE
 Right Join ESPECIES E on P.IDESPECIE = E.IDESPECIE
 Order by E.ESPECIE asc
+
+-- De las personas de mas de 40 años, 
+-- el nombre, cantidad de peces pescados de cada especie
+-- sin tener en cuenta los peces de menos de 5 kg, y la cantidad de peces descartados
+
+
+		select par.NOMBRE as nombre, count(*) as cantidadPescada, es.ESPECIE
+		from PARTICIPANTES par inner join PESCA pe
+		on par.IDPARTICIPANTE=pe.IDPARTICIPANTE
+		left join ESPECIES es on es.IDESPECIE=pe.IDESPECIE
+		where year(getdate())-year(par.FECHA_NACIMIENTO)>39 and pe.PESO>5
+		group by par.NOMBRE, es.ESPECIE
+		order by par.NOMBRE asc
+
+		select part.NOMBRE, count(*) as pecesDescartados, 'Descartados'
+		from PESCA pe, PARTICIPANTES part
+		where pe.IDESPECIE is null
+		and pe.IDPARTICIPANTE=part.IDPARTICIPANTE
+		group by part.NOMBRE
+
+select *
+from PARTICIPANTES par inner join PESCA pe
+on par.IDPARTICIPANTE=pe.IDPARTICIPANTE
+inner join ESPECIES es on es.IDESPECIE=pe.IDESPECIE
